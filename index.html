@@ -1,660 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Study Planner</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>Spotify Clone</title>
 
   <style>
+
     *{
       margin:0;
       padding:0;
       box-sizing:border-box;
-    }
-
-    :root{
-      --bg:#0d0f1a;
-      --card:#1b2035;
-      --card2:#232844;
-      --border:#2f3557;
-      --text:#eef1ff;
-      --muted:#8a92c7;
-      --accent:#6c63ff;
-      --pink:#ff6584;
-      --green:#43e97b;
-      --gold:#ffd166;
+      font-family:Arial;
     }
 
     body{
-      font-family:'DM Sans',sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-      padding:30px 20px;
+      background:#121212;
+      color:white;
     }
 
-    .app{
-      max-width:1100px;
-      margin:auto;
+    .navbar{
+      background:black;
+      padding:20px;
+      font-size:28px;
+      font-weight:bold;
+      color:#1DB954;
     }
 
-    header{
-      text-align:center;
-      margin-bottom:40px;
-    }
-
-    .badge{
-      display:inline-block;
-      background:rgba(108,99,255,.15);
-      color:#b6b0ff;
-      border:1px solid rgba(108,99,255,.3);
-      padding:8px 16px;
-      border-radius:50px;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:1px;
-      margin-bottom:20px;
+    .container{
+      padding:30px;
     }
 
     h1{
-      font-family:'Syne',sans-serif;
-      font-size:56px;
-      line-height:1.1;
-      margin-bottom:10px;
-      background:linear-gradient(135deg,#ffffff,#9f95ff,#ff6584);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
-
-    header p{
-      color:var(--muted);
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:15px;
-      margin-bottom:40px;
-    }
-
-    .stat-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:20px;
-    }
-
-    .stat-card .label{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:8px;
-      text-transform:uppercase;
-    }
-
-    .stat-card .value{
-      font-size:38px;
-      font-family:'Syne',sans-serif;
-      font-weight:800;
-    }
-
-    .purple{ color:var(--accent); }
-    .pink{ color:var(--pink); }
-    .green{ color:var(--green); }
-    .gold{ color:var(--gold); }
-
-    .section-title{
-      font-family:'Syne',sans-serif;
-      margin-bottom:18px;
-      font-size:20px;
-    }
-
-    .courses-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:12px;
-      margin-bottom:25px;
-    }
-
-    .course{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:16px;
-      cursor:pointer;
-      transition:.2s;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
-    .course:hover{
-      transform:translateY(-2px);
-      border-color:var(--accent);
-    }
-
-    .course.selected{
-      background:rgba(108,99,255,.15);
-      border-color:var(--accent);
-    }
-
-    .course .icon{
-      font-size:26px;
-    }
-
-    .course .name{
-      font-weight:700;
-    }
-
-    .course .cat{
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .add-row{
-      display:flex;
-      gap:10px;
-      margin-bottom:40px;
-    }
-
-    input,select{
-      background:var(--card);
-      border:1px solid var(--border);
-      color:var(--text);
-      padding:12px;
-      border-radius:10px;
-      width:100%;
-      outline:none;
-    }
-
-    button{
-      background:var(--accent);
-      border:none;
-      color:white;
-      padding:12px 18px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:700;
-      transition:.2s;
-    }
-
-    button:hover{
-      opacity:.9;
-      transform:translateY(-1px);
-    }
-
-    .session-form{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr auto;
-      gap:12px;
-      margin-top:20px;
-      margin-bottom:30px;
-    }
-
-    .session-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:16px;
-      margin-bottom:10px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    .session-left{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-
-    .dot{
-      width:12px;
-      height:12px;
-      border-radius:50%;
-    }
-
-    .session-name{
-      font-weight:700;
-    }
-
-    .session-meta{
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .delete{
-      background:none;
-      border:none;
-      color:#ff6584;
-      font-size:20px;
-      cursor:pointer;
-    }
-
-    .progress-item{
       margin-bottom:20px;
     }
 
-    .progress-top{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:8px;
+    .songs{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:20px;
     }
 
-    .progress-bar{
-      height:8px;
-      background:var(--card);
-      border-radius:999px;
-      overflow:hidden;
+    .card{
+      background:#181818;
+      padding:15px;
+      border-radius:10px;
+      transition:0.3s;
     }
 
-    .progress-fill{
-      height:100%;
-      border-radius:999px;
+    .card:hover{
+      background:#282828;
+      transform:scale(1.03);
     }
 
-    .empty{
-      background:var(--card);
-      border:1px dashed var(--border);
-      padding:40px;
-      border-radius:14px;
+    .card img{
+      width:100%;
+      border-radius:10px;
+    }
+
+    .song-name{
+      margin-top:10px;
+      font-weight:bold;
+    }
+
+    .artist{
+      color:gray;
+      font-size:14px;
+      margin-top:5px;
+    }
+
+    .play{
+      margin-top:10px;
+      background:#1DB954;
+      border:none;
+      padding:10px 15px;
+      border-radius:20px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .player{
+      position:fixed;
+      bottom:0;
+      width:100%;
+      background:black;
+      padding:15px;
       text-align:center;
-      color:var(--muted);
     }
 
-    @media(max-width:700px){
-      h1{
-        font-size:40px;
-      }
-
-      .session-form{
-        grid-template-columns:1fr;
-      }
-
-      .add-row{
-        flex-direction:column;
-      }
-    }
   </style>
 </head>
+
 <body>
 
-<div class="app">
-
-  <header>
-    <div class="badge">📚 STUDY PLANNER</div>
-    <h1>Plan Your Learning<br>Like a Pro</h1>
-    <p>Track courses, schedule sessions, and monitor progress.</p>
-  </header>
-
-  <div class="stats">
-    <div class="stat-card">
-      <div class="label">Courses</div>
-      <div class="value purple" id="statCourses">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="label">Sessions</div>
-      <div class="value pink" id="statSessions">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="label">Hours</div>
-      <div class="value green" id="statHours">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="label">Today</div>
-      <div class="value gold" id="statToday">0h</div>
-    </div>
+  <div class="navbar">
+    Spotify
   </div>
 
-  <div class="section-title">① Pick Your Courses</div>
+  <div class="container">
 
-  <div class="courses-grid" id="coursesGrid"></div>
+    <h1>Trending Songs</h1>
 
-  <div class="add-row">
-    <input type="text" id="customCourse" placeholder="Add custom course...">
-    <button onclick="addCustomCourse()">+ Add</button>
-  </div>
+    <div class="songs">
 
-  <div class="section-title">② Schedule Sessions</div>
+      <div class="card">
+        <img src="https://picsum.photos/300?1">
+        <div class="song-name">Blinding Lights</div>
+        <div class="artist">The Weeknd</div>
+        <button class="play">Play</button>
+      </div>
 
-  <div id="sessionList"></div>
+      <div class="card">
+        <img src="https://picsum.photos/300?2">
+        <div class="song-name">Levitating</div>
+        <div class="artist">Dua Lipa</div>
+        <button class="play">Play</button>
+      </div>
 
-  <div class="session-form">
+      <div class="card">
+        <img src="https://picsum.photos/300?3">
+        <div class="song-name">Believer</div>
+        <div class="artist">Imagine Dragons</div>
+        <button class="play">Play</button>
+      </div>
 
-    <select id="courseSelect">
-      <option value="">Select Course</option>
-    </select>
+      <div class="card">
+        <img src="https://picsum.photos/300?4">
+        <div class="song-name">Starboy</div>
+        <div class="artist">The Weeknd</div>
+        <button class="play">Play</button>
+      </div>
 
-    <select id="daySelect">
-      <option>Monday</option>
-      <option>Tuesday</option>
-      <option>Wednesday</option>
-      <option>Thursday</option>
-      <option>Friday</option>
-      <option>Saturday</option>
-      <option>Sunday</option>
-    </select>
-
-    <select id="durationSelect">
-      <option value="0.5">30 min</option>
-      <option value="1">1 hour</option>
-      <option value="2">2 hours</option>
-      <option value="3">3 hours</option>
-      <option value="4">4 hours</option>
-    </select>
-
-    <button onclick="addSession()">Add Session</button>
+    </div>
 
   </div>
 
-  <div class="section-title">③ Weekly Progress</div>
-
-  <div id="progressList"></div>
-
-</div>
-
-<script>
-
-const COLORS = [
-  "#6c63ff",
-  "#ff6584",
-  "#43e97b",
-  "#ffd166",
-  "#4ecdc4",
-  "#ff9f43"
-];
-
-const PRESET = [
-  {name:"Mathematics",icon:"🔢",cat:"Science"},
-  {name:"Physics",icon:"⚛️",cat:"Science"},
-  {name:"Chemistry",icon:"🧪",cat:"Science"},
-  {name:"Computer Science",icon:"💻",cat:"Technology"},
-  {name:"Web Development",icon:"🌐",cat:"Technology"},
-  {name:"History",icon:"📜",cat:"Humanities"},
-  {name:"English",icon:"✍️",cat:"Language"},
-  {name:"Statistics",icon:"📊",cat:"Science"}
-];
-
-let courses = [];
-let sessions = [];
-let id = 100;
-
-function initCourses(){
-  courses = PRESET.map((c,i)=>({
-    ...c,
-    id:i+1,
-    selected:false,
-    color:COLORS[i % COLORS.length]
-  }));
-}
-
-function saveData(){
-  localStorage.setItem("study_courses",JSON.stringify(courses));
-  localStorage.setItem("study_sessions",JSON.stringify(sessions));
-}
-
-function loadData(){
-
-  const c = localStorage.getItem("study_courses");
-  const s = localStorage.getItem("study_sessions");
-
-  if(c){
-    courses = JSON.parse(c);
-  }else{
-    initCourses();
-  }
-
-  if(s){
-    sessions = JSON.parse(s);
-  }
-}
-
-function renderCourses(){
-
-  const grid = document.getElementById("coursesGrid");
-
-  grid.innerHTML = courses.map(c=>`
-    <div class="course ${c.selected ? 'selected':''}" onclick="toggleCourse(${c.id})">
-
-      <div class="icon">${c.icon}</div>
-
-      <div>
-        <div class="name">${c.name}</div>
-        <div class="cat">${c.cat}</div>
-      </div>
-
-    </div>
-  `).join('');
-
-  updateCourseSelect();
-  updateStats();
-  renderProgress();
-}
-
-function toggleCourse(id){
-
-  const c = courses.find(x=>x.id===id);
-
-  c.selected = !c.selected;
-
-  saveData();
-  renderCourses();
-}
-
-function addCustomCourse(){
-
-  const input = document.getElementById("customCourse");
-
-  const name = input.value.trim();
-
-  if(!name) return;
-
-  const icons = ["🚀","✨","📘","🧠","🎯","📚"];
-
-  courses.push({
-    id:id++,
-    name:name,
-    icon:icons[Math.floor(Math.random()*icons.length)],
-    cat:"Custom",
-    selected:true,
-    color:COLORS[courses.length % COLORS.length]
-  });
-
-  input.value = "";
-
-  saveData();
-  renderCourses();
-}
-
-function updateCourseSelect(){
-
-  const select = document.getElementById("courseSelect");
-
-  const selected = courses.filter(c=>c.selected);
-
-  select.innerHTML = `
-    <option value="">Select Course</option>
-    ${selected.map(c=>`
-      <option value="${c.id}">
-        ${c.icon} ${c.name}
-      </option>
-    `).join('')}
-  `;
-}
-
-function addSession(){
-
-  const cid = parseInt(document.getElementById("courseSelect").value);
-
-  if(!cid){
-    alert("Please select a course");
-    return;
-  }
-
-  const day = document.getElementById("daySelect").value;
-
-  const duration = parseFloat(document.getElementById("durationSelect").value);
-
-  const course = courses.find(c=>c.id===cid);
-
-  sessions.push({
-    id:id++,
-    courseId:cid,
-    name:course.name,
-    icon:course.icon,
-    color:course.color,
-    day:day,
-    duration:duration
-  });
-
-  saveData();
-
-  renderSessions();
-  renderProgress();
-  updateStats();
-}
-
-function deleteSession(idd){
-
-  sessions = sessions.filter(s=>s.id!==idd);
-
-  saveData();
-
-  renderSessions();
-  renderProgress();
-  updateStats();
-}
-
-function renderSessions(){
-
-  const list = document.getElementById("sessionList");
-
-  if(!sessions.length){
-
-    list.innerHTML = `
-      <div class="empty">
-        No sessions added yet.
-      </div>
-    `;
-
-    return;
-  }
-
-  list.innerHTML = sessions.map(s=>`
-    <div class="session-card">
-
-      <div class="session-left">
-
-        <div class="dot" style="background:${s.color}"></div>
-
-        <div>
-          <div class="session-name">${s.icon} ${s.name}</div>
-          <div class="session-meta">
-            ${s.day} • ${s.duration} hour(s)
-          </div>
-        </div>
-
-      </div>
-
-      <button class="delete" onclick="deleteSession(${s.id})">
-        ✕
-      </button>
-
-    </div>
-  `).join('');
-}
-
-function updateStats(){
-
-  document.getElementById("statCourses").textContent =
-    courses.filter(c=>c.selected).length;
-
-  document.getElementById("statSessions").textContent =
-    sessions.length;
-
-  const total = sessions.reduce((a,s)=>a+s.duration,0);
-
-  document.getElementById("statHours").textContent =
-    total;
-
-  const today = new Date().toLocaleDateString('en-US',{
-    weekday:'long'
-  });
-
-  const todayHours = sessions
-    .filter(s=>s.day===today)
-    .reduce((a,s)=>a+s.duration,0);
-
-  document.getElementById("statToday").textContent =
-    todayHours + "h";
-}
-
-function renderProgress(){
-
-  const list = document.getElementById("progressList");
-
-  const selected = courses.filter(c=>c.selected);
-
-  if(!selected.length){
-
-    list.innerHTML = `
-      <div class="empty">
-        Select courses to view progress.
-      </div>
-    `;
-
-    return;
-  }
-
-  const total = sessions.reduce((a,s)=>a+s.duration,0);
-
-  list.innerHTML = selected.map(c=>{
-
-    const hrs = sessions
-      .filter(s=>s.courseId===c.id)
-      .reduce((a,s)=>a+s.duration,0);
-
-    const percent = total
-      ? Math.round((hrs/total)*100)
-      : 0;
-
-    return `
-      <div class="progress-item">
-
-        <div class="progress-top">
-          <div>${c.icon} ${c.name}</div>
-          <div>${hrs} hrs (${percent}%)</div>
-        </div>
-
-        <div class="progress-bar">
-          <div
-            class="progress-fill"
-            style="width:${percent}%;background:${c.color}"
-          ></div>
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-  loadData();
-
-  renderCourses();
-  renderSessions();
-  renderProgress();
-  updateStats();
-
-});
-
-</script>
+  <div class="player">
+    🎵 Now Playing: Blinding Lights
+  </div>
 
 </body>
 </html>
