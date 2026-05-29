@@ -547,4 +547,24 @@
     const total = sessions.reduce((a, s) => a + s.duration, 0);
     list.innerHTML = selected.map(c => {
       const hrs = sessions.filter(s => s.courseId === c.id).reduce((a, s) => a + s.duration, 0);
-      const pct = total > 0 ? Math.round((hrs / total) * 100)
+      const pct = total > 0 ? Math.round((hrs / total) * 100) : 0;
+      return `
+        <div class="progress-item">
+          <div class="progress-top">
+            <div class="pname">${c.icon} ${c.name}</div>
+            <div class="phrs">${hrs > 0 ? (hrs % 1 === 0 ? hrs : hrs.toFixed(1)) + ' hrs' : 'No sessions'} ${total > 0 ? '· ' + pct + '%' : ''}</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%;background:${c.color}"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+  renderCourses();
+  renderSessions();
+});
+</script>
+</body>
+</html>
