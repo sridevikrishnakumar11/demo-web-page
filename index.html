@@ -1,1 +1,550 @@
-hello guysss!!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f1a;
+      --surface: #151826;
+      --card: #1c2035;
+      --card2: #212540;
+      --border: #2a2f4d;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #e8eaf6;
+      --muted: #7b82b0;
+      --gold: #ffd166;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(108,99,255,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,101,132,.12) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(67,233,123,.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    header {
+      text-align: center;
+      padding: 3rem 0 2.5rem;
+      animation: fadeDown .7s ease both;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(108,99,255,.18);
+      border: 1px solid rgba(108,99,255,.4);
+      color: #a89cff;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .3rem .9rem;
+      border-radius: 99px;
+      margin-bottom: 1.2rem;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #e8eaf6 30%, #a89cff 70%, #ff6584 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      margin-top: .8rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+    }
+
+    section { animation: fadeUp .6s ease both; }
+    section:nth-child(2) { animation-delay: .1s; }
+    section:nth-child(3) { animation-delay: .2s; }
+    section:nth-child(4) { animation-delay: .3s; }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .section-title span { color: var(--accent); font-size: 1.2rem; }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .75rem;
+      margin-bottom: 2.5rem;
+    }
+    .course-chip {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      user-select: none;
+    }
+    .course-chip:hover { border-color: var(--accent); background: var(--card2); transform: translateY(-2px); }
+    .course-chip.selected {
+      border-color: var(--accent);
+      background: rgba(108,99,255,.18);
+      box-shadow: 0 0 0 3px rgba(108,99,255,.15), 0 4px 20px rgba(108,99,255,.2);
+    }
+    .course-chip .icon { font-size: 1.4rem; flex-shrink: 0; }
+    .course-chip .info { overflow: hidden; }
+    .course-chip .name { font-weight: 600; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .course-chip .cat { font-size: .73rem; color: var(--muted); margin-top: .15rem; }
+    .course-chip .check {
+      margin-left: auto;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+      transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem;
+    }
+    .course-chip.selected .check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .add-course-row {
+      display: flex;
+      gap: .6rem;
+      margin-bottom: 2.5rem;
+    }
+    .add-course-row input {
+      flex: 1;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .7rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .add-course-row input:focus { border-color: var(--accent); }
+    .add-course-row input::placeholder { color: var(--muted); }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .7rem 1.2rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #5a52e0; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: #a89cff;
+    }
+    .btn-outline:hover { background: rgba(108,99,255,.12); }
+
+    .schedule-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+    .schedule-empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      background: var(--card);
+      border: 1.5px dashed var(--border);
+      border-radius: 16px;
+      font-size: .95rem;
+    }
+    .schedule-empty .big { font-size: 2.5rem; margin-bottom: .5rem; }
+
+    .session-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      margin-bottom: .7rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto;
+      align-items: center;
+      gap: .8rem;
+      transition: all .2s;
+      animation: fadeUp .3s ease both;
+    }
+    .session-card:hover { background: var(--card2); }
+    .session-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .session-info .course-name { font-weight: 600; font-size: .95rem; }
+    .session-info .session-meta { font-size: .78rem; color: var(--muted); margin-top: .2rem; }
+    .session-duration {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .88rem;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    select {
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      padding: .3rem .6rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .del-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: .3rem;
+      border-radius: 6px;
+      transition: all .2s;
+    }
+    .del-btn:hover { color: var(--accent2); background: rgba(255,101,132,.1); }
+
+    .add-session-form {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: .7rem;
+      align-items: end;
+    }
+    .form-group label { display: block; font-size: .75rem; color: var(--muted); margin-bottom: .3rem; font-weight: 500; letter-spacing: .04em; }
+    .form-group select, .form-group input {
+      width: 100%;
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      padding: .55rem .8rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-group select:focus, .form-group input:focus { border-color: var(--accent); }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: .75rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+    .stat-card .label { font-size: .75rem; color: var(--muted); font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
+    .stat-card .value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+    .stat-card .sub { font-size: .78rem; color: var(--muted); }
+    .c-purple { color: var(--accent); }
+    .c-pink   { color: var(--accent2); }
+    .c-green  { color: var(--accent3); }
+    .c-gold   { color: var(--gold); }
+
+    .progress-list { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 2.5rem; }
+    .progress-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .35rem; }
+    .progress-top .pname { font-size: .88rem; font-weight: 500; }
+    .progress-top .phrs { font-size: .78rem; color: var(--muted); }
+    .progress-bar { height: 6px; background: var(--card); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.34,1.56,.64,1); }
+
+    @media (max-width: 600px) {
+      .add-session-form { grid-template-columns: 1fr 1fr; }
+      .add-session-form .btn { grid-column: 1 / -1; }
+      .session-card { grid-template-columns: auto 1fr auto; }
+      .session-card .session-duration { display: none; }
+    }
+
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:none; } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:none; } }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="badge">📚 Study Planner</div>
+    <h1>Plan Your Learning<br>Like a Pro</h1>
+    <p>Choose your courses, schedule sessions, and track your progress.</p>
+  </header>
+
+  <section>
+    <div class="stats-row">
+      <div class="stat-card"><div class="label">Courses</div><div class="value c-purple" id="statCourses">0</div><div class="sub">selected</div></div>
+      <div class="stat-card"><div class="label">Sessions</div><div class="value c-pink" id="statSessions">0</div><div class="sub">scheduled</div></div>
+      <div class="stat-card"><div class="label">Total Hours</div><div class="value c-green" id="statHours">0</div><div class="sub">this week</div></div>
+      <div class="stat-card"><div class="label">Today</div><div class="value c-gold" id="statToday">0h</div><div class="sub">study time</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span>①</span> Pick Your Courses</div>
+    <div class="courses-grid" id="coursesGrid"></div>
+    <div class="add-course-row">
+      <input type="text" id="customCourseInput" placeholder="Add a custom course (e.g. Machine Learning)…" maxlength="50"/>
+      <button class="btn" onclick="addCustomCourse()">+ Add</button>
+    </div>
+  </section>
+
+  <hr/>
+
+  <section>
+    <div class="schedule-header">
+      <div class="section-title" style="margin:0"><span>②</span> Schedule Sessions</div>
+      <button class="btn btn-outline" onclick="clearSessions()">Clear All</button>
+    </div>
+    <div id="sessionList"></div>
+    <div class="add-session-form">
+      <div class="form-group">
+        <label>Course</label>
+        <select id="fCourse"><option value="">— select —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Day</label>
+        <select id="fDay">
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+          <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Duration (hrs)</label>
+        <select id="fDuration">
+          <option value="0.5">30 min</option><option value="1" selected>1 hr</option>
+          <option value="1.5">1.5 hrs</option><option value="2">2 hrs</option>
+          <option value="2.5">2.5 hrs</option><option value="3">3 hrs</option>
+          <option value="4">4 hrs</option>
+        </select>
+      </div>
+      <button class="btn" onclick="addSession()">+ Add Session</button>
+    </div>
+  </section>
+
+  <hr/>
+
+  <section>
+    <div class="section-title"><span>③</span> Weekly Progress</div>
+    <div class="progress-list" id="progressList">
+      <div style="color:var(--muted);font-size:.9rem;">Select courses and add sessions to see your progress breakdown.</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const PRESET_COURSES = [
+    { name:"Mathematics",      icon:"🔢", cat:"Science" },
+    { name:"Physics",          icon:"⚛️",  cat:"Science" },
+    { name:"Chemistry",        icon:"🧪", cat:"Science" },
+    { name:"Biology",          icon:"🌿", cat:"Science" },
+    { name:"Computer Science", icon:"💻", cat:"Technology" },
+    { name:"Data Structures",  icon:"🌲", cat:"Technology" },
+    { name:"Web Development",  icon:"🌐", cat:"Technology" },
+    { name:"History",          icon:"📜", cat:"Humanities" },
+    { name:"Literature",       icon:"📖", cat:"Humanities" },
+    { name:"Philosophy",       icon:"🧠", cat:"Humanities" },
+    { name:"Economics",        icon:"📈", cat:"Social" },
+    { name:"Psychology",       icon:"🪬", cat:"Social" },
+    { name:"Statistics",       icon:"📊", cat:"Science" },
+    { name:"English",          icon:"✍️",  cat:"Language" },
+    { name:"Art & Design",     icon:"🎨", cat:"Creative" },
+    { name:"Music Theory",     icon:"🎵", cat:"Creative" },
+  ];
+
+  const COLORS = [
+    "#6c63ff","#ff6584","#43e97b","#ffd166",
+    "#4ecdc4","#ff9f43","#a29bfe","#fd79a8",
+    "#00b894","#fdcb6e","#74b9ff","#e17055",
+    "#55efc4","#fab1a0","#81ecec","#636e72",
+  ];
+
+  let courses = PRESET_COURSES.map((c, i) => ({ ...c, id: i, selected: false, color: COLORS[i % COLORS.length] }));
+  let sessions = [];
+  let nextId = 100;
+  const TODAY = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+  function renderCourses() {
+    const grid = document.getElementById('coursesGrid');
+    grid.innerHTML = courses.map(c => `
+      <div class="course-chip ${c.selected ? 'selected' : ''}" onclick="toggleCourse(${c.id})">
+        <span class="icon">${c.icon}</span>
+        <div class="info">
+          <div class="name">${c.name}</div>
+          <div class="cat">${c.cat}</div>
+        </div>
+        <div class="check" style="${c.selected ? background:${c.color};border-color:${c.color} : ''}">
+          ${c.selected ? '✓' : ''}
+        </div>
+      </div>
+    `).join('');
+    updateCourseSelect();
+    renderProgress();
+    updateStats();
+  }
+
+  function toggleCourse(id) {
+    const c = courses.find(x => x.id === id);
+    if (c) { c.selected = !c.selected; renderCourses(); }
+  }
+
+  function addCustomCourse() {
+    const inp = document.getElementById('customCourseInput');
+    const name = inp.value.trim();
+    if (!name) return;
+    const icons = ['📌','🔖','💡','🚀','🎯','✨','📝','🔍'];
+    courses.push({
+      id: nextId++, name,
+      icon: icons[Math.floor(Math.random() * icons.length)],
+      cat: 'Custom', selected: true,
+      color: COLORS[courses.length % COLORS.length]
+    });
+    inp.value = '';
+    renderCourses();
+  }
+
+  document.getElementById('customCourseInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addCustomCourse();
+  });
+
+  function updateCourseSelect() {
+    const sel = document.getElementById('fCourse');
+    const cur = sel.value;
+    const selected = courses.filter(c => c.selected);
+    sel.innerHTML = selected.length
+      ? '<option value="">— select —</option>' + selected.map(c => <option value="${c.id}">${c.icon} ${c.name}</option>).join('')
+      : '<option value="">No courses selected</option>';
+    if (cur) sel.value = cur;
+  }
+
+  function addSession() {
+    const cid = parseInt(document.getElementById('fCourse').value);
+    const day  = document.getElementById('fDay').value;
+    const dur  = parseFloat(document.getElementById('fDuration').value);
+    if (!cid) { alert('Please select a course first.'); return; }
+    const course = courses.find(c => c.id === cid);
+    sessions.push({ id: nextId++, courseId: cid, courseName: course.name, icon: course.icon, color: course.color, day, duration: dur });
+    renderSessions();
+    updateStats();
+    renderProgress();
+  }
+
+  function deleteSession(id) {
+    sessions = sessions.filter(s => s.id !== id);
+    renderSessions();
+    updateStats();
+    renderProgress();
+  }
+
+  function clearSessions() {
+    if (sessions.length && !confirm('Clear all sessions?')) return;
+    sessions = [];
+    renderSessions();
+    updateStats();
+    renderProgress();
+  }
+
+  function renderSessions() {
+    const list = document.getElementById('sessionList');
+    if (!sessions.length) {
+      list.innerHTML = <div class="schedule-empty"><div class="big">🗓️</div>No sessions yet. Pick courses above, then add a session below.</div>;
+      return;
+    }
+    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const grouped = {};
+    days.forEach(d => { grouped[d] = sessions.filter(s => s.day === d); });
+
+    list.innerHTML = days.filter(d => grouped[d].length).map(day => `
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.4rem;padding-left:.2rem;">
+          ${day === TODAY ? '📍 ' : ''}${day}${day === TODAY ? ' — Today' : ''}
+        </div>
+        ${grouped[day].map(s => `
+          <div class="session-card">
+            <div class="session-dot" style="background:${s.color}"></div>
+            <div class="session-info">
+              <div class="course-name">${s.icon} ${s.courseName}</div>
+              <div class="session-meta">${s.duration >= 1 ? s.duration + ' hr' + (s.duration > 1 ? 's' : '') : (s.duration * 60) + ' min'}</div>
+            </div>
+            <div class="session-duration">${s.duration}h</div>
+            <button class="del-btn" onclick="deleteSession(${s.id})" title="Remove">✕</button>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function updateStats() {
+    const sel = courses.filter(c => c.selected).length;
+    const totalHrs = sessions.reduce((a, s) => a + s.duration, 0);
+    const todayHrs = sessions.filter(s => s.day === TODAY).reduce((a, s) => a + s.duration, 0);
+    document.getElementById('statCourses').textContent = sel;
+    document.getElementById('statSessions').textContent = sessions.length;
+    document.getElementById('statHours').textContent = totalHrs % 1 === 0 ? totalHrs : totalHrs.toFixed(1);
+    document.getElementById('statToday').textContent = (todayHrs % 1 === 0 ? todayHrs : todayHrs.toFixed(1)) + 'h';
+  }
+
+  function renderProgress() {
+    const list = document.getElementById('progressList');
+    const selected = courses.filter(c => c.selected);
+    if (!selected.length) {
+      list.innerHTML = <div style="color:var(--muted);font-size:.9rem;">Select courses and add sessions to see your progress breakdown.</div>;
+      return;
+    }
+    const total = sessions.reduce((a, s) => a + s.duration, 0);
+    list.innerHTML = selected.map(c => {
+      const hrs = sessions.filter(s => s.courseId === c.id).reduce((a, s) => a + s.duration, 0);
+      const pct = total > 0 ? Math.round((hrs / total) * 100)
