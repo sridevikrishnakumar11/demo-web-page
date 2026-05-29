@@ -1,192 +1,526 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Spotify Clone</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{--green:#1db954;--bg:#121212;--card:#181818;--hover:#282828;--sub:#b3b3b3}
-    body{display:grid;grid-template-columns:200px 1fr;grid-template-rows:1fr 80px;grid-template-areas:"side main""player player";height:100vh;background:var(--bg);color:#fff;font-family:Arial,sans-serif;overflow:hidden}
-    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#444;border-radius:2px}
-    .sidebar{grid-area:side;background:#000;padding:16px 10px;display:flex;flex-direction:column;overflow-y:auto}
-    .logo{display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:24px;font-size:1.1rem;font-weight:700}
-    .logo i{color:var(--green);font-size:1.8rem}
-    .nav a{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:4px;color:var(--sub);text-decoration:none;font-size:.83rem;font-weight:600;transition:.2s}
-    .nav a:hover,.nav a.active{color:#fff;background:var(--hover)}
-    .nav a.active i{color:var(--green)}
-    hr{border:none;border-top:1px solid #333;margin:14px 0}
-    .plist{list-style:none}
-    .plist li{color:var(--sub);font-size:.78rem;padding:6px 8px;cursor:pointer;border-radius:4px;transition:.2s}
-    .plist li:hover{color:#fff;background:var(--hover)}
-    .main{grid-area:main;overflow-y:auto;background:linear-gradient(180deg,#1a3a2a,var(--bg) 280px)}
-    .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;position:sticky;top:0;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);z-index:9}
-    .arrows{display:flex;gap:6px}
-    .arrows button{background:rgba(0,0,0,.6);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.72rem}
-    .topbar-r{display:flex;align-items:center;gap:8px}
-    .upbtn{background:#fff;color:#000;border:none;padding:6px 16px;border-radius:20px;font-weight:700;font-size:.78rem;cursor:pointer}
-    .user{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.6);padding:3px 10px 3px 3px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;color:#fff}
-    .user .av{background:#444;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem}
-    .banner{padding:36px 28px 28px;background:linear-gradient(135deg,#1db954,#005c2a)}
-    .banner small{font-size:.65rem;font-weight:700;letter-spacing:2px;background:rgba(0,0,0,.3);padding:3px 8px;border-radius:3px}
-    .banner h1{font-size:2.8rem;font-weight:800;margin:8px 0 6px}
-    .banner p{color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:18px}
-    .banner button{background:var(--green);color:#000;border:none;padding:11px 28px;border-radius:24px;font-size:.85rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-    .banner button:hover{filter:brightness(1.1)}
-    .section{padding:28px 28px 32px}
-    .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .sh h2{font-size:1.15rem;font-weight:700}
-    .sh a{font-size:.72rem;color:var(--sub);text-decoration:none;text-transform:uppercase;letter-spacing:1px}
-    .sh a:hover{color:#fff;text-decoration:underline}
-    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-    .card{background:var(--card);border-radius:8px;padding:14px;cursor:pointer;text-align:center;transition:.2s;position:relative}
-    .card:hover{background:var(--hover);transform:translateY(-3px)}
-    .card:hover .cplay{opacity:1;transform:translateY(0)}
-    .cimg{width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#333;margin:0 auto 12px}
-    .cimg img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s}
-    .card:hover .cimg img{transform:scale(1.06)}
-    .cplay{position:absolute;bottom:60px;right:12px;background:var(--green);color:#000;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(6px);transition:.2s;box-shadow:0 4px 14px rgba(0,0,0,.5)}
-    .cplay i{margin-left:2px;font-size:.9rem}
-    .ctitle{font-size:.88rem;font-weight:700;margin-bottom:4px}
-    .csub{font-size:.74rem;color:var(--sub)}
-    .player{grid-area:player;background:#181818;border-top:1px solid #282828;display:grid;grid-template-columns:1fr 2fr 1fr;align-items:center;padding:0 16px;gap:12px}
-    .np{display:flex;align-items:center;gap:10px;min-width:0}
-    .npimg{width:50px;height:50px;min-width:50px;border-radius:4px;overflow:hidden;background:#333;display:flex;align-items:center;justify-content:center}
-    .npimg img{width:100%;height:100%;object-fit:cover;display:block}
-    .npimg i{font-size:1.4rem;color:var(--green)}
-    .ninfo .nt{display:block;font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .ninfo .na{display:block;font-size:.7rem;color:var(--sub)}
-    .lico{font-size:.9rem;color:var(--sub);cursor:pointer;margin-left:8px;transition:.2s}
-    .lico:hover{color:var(--green)}
-    .ctrl{display:flex;flex-direction:column;align-items:center;gap:8px}
-    .cbtns{display:flex;align-items:center;gap:14px}
-    .cb{background:none;border:none;color:var(--sub);cursor:pointer;font-size:.95rem;padding:4px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.15s}
-    .cb:hover{color:#fff;transform:scale(1.1)}
-    .cb.pp{background:#fff;color:#000;width:32px;height:32px;font-size:.82rem}
-    .cb.pp:hover{background:#ddd}
-    .pbc{display:flex;align-items:center;gap:8px;width:100%}
-    .tm{font-size:.65rem;color:var(--sub);min-width:26px}
-    .pb{flex:1;height:3px;background:#444;border-radius:2px;position:relative;cursor:pointer}
-    .pb:hover{height:5px}
-    .pb:hover .pf{background:var(--green)}
-    .pb:hover .pt{opacity:1}
-    .pf{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:0%;pointer-events:none}
-    .pt{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:#fff;border-radius:50%;opacity:0;pointer-events:none}
-    .vol{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-    .vol>i{font-size:.9rem;color:var(--sub)}
-    .vb{width:80px;height:3px;background:#444;border-radius:2px;position:relative;cursor:pointer}
-    .vb:hover{height:5px}
-    .vb:hover .vf{background:var(--green)}
-    .vb:hover .vt{opacity:1}
-    .vf{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:2px;width:70%;pointer-events:none}
-    .vt{position:absolute;top:50%;left:70%;transform:translate(-50%,-50%);width:10px;height:10px;background:#fff;border-radius:50%;opacity:0;pointer-events:none}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spotify Clone</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --green:#1db954;
+  --bg:#121212;
+  --card:#181818;
+  --hover:#282828;
+  --sub:#b3b3b3;
+}
+
+body{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  grid-template-rows:1fr 80px;
+  grid-template-areas:
+  "side main"
+  "player player";
+  height:100vh;
+  background:var(--bg);
+  color:white;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  grid-area:side;
+  background:black;
+  padding:20px 12px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:1.4rem;
+  font-weight:bold;
+  margin-bottom:30px;
+}
+
+.logo i{
+  color:var(--green);
+  font-size:2rem;
+}
+
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:var(--sub);
+  padding:12px;
+  border-radius:6px;
+  margin-bottom:6px;
+  transition:.2s;
+}
+
+.nav a:hover,
+.nav a.active{
+  background:var(--hover);
+  color:white;
+}
+
+.playlist{
+  margin-top:25px;
+}
+
+.playlist h3{
+  margin-bottom:10px;
+  color:#fff;
+}
+
+.playlist p{
+  color:var(--sub);
+  margin:10px 0;
+  cursor:pointer;
+}
+
+/* MAIN */
+
+.main{
+  grid-area:main;
+  overflow-y:auto;
+  background:linear-gradient(180deg,#1a3a2a,var(--bg) 300px);
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 30px;
+  position:sticky;
+  top:0;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(10px);
+}
+
+.arrows button{
+  background:black;
+  border:none;
+  color:white;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  margin-right:8px;
+  cursor:pointer;
+}
+
+.user{
+  background:black;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:.9rem;
+}
+
+.banner{
+  padding:40px 30px;
+}
+
+.banner small{
+  letter-spacing:2px;
+  font-weight:bold;
+}
+
+.banner h1{
+  font-size:3rem;
+  margin:10px 0;
+}
+
+.banner p{
+  color:#ddd;
+  margin-bottom:20px;
+}
+
+.banner button{
+  background:var(--green);
+  border:none;
+  padding:12px 24px;
+  border-radius:30px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.section{
+  padding:20px 30px 40px;
+}
+
+.section h2{
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:10px;
+  transition:.2s;
+  cursor:pointer;
+  text-align:center;
+}
+
+.card:hover{
+  background:var(--hover);
+  transform:translateY(-4px);
+}
+
+.card img{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:50%;
+  margin-bottom:15px;
+}
+
+.card h3{
+  margin-bottom:6px;
+}
+
+.card p{
+  color:var(--sub);
+  font-size:.85rem;
+}
+
+/* PLAYER */
+
+.player{
+  grid-area:player;
+  background:#181818;
+  border-top:1px solid #333;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 20px;
+}
+
+.song{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.song img{
+  width:55px;
+  height:55px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.controls{
+  text-align:center;
+}
+
+.controls button{
+  background:none;
+  border:none;
+  color:white;
+  font-size:1rem;
+  margin:0 10px;
+  cursor:pointer;
+}
+
+.play-btn{
+  background:white !important;
+  color:black !important;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+
+.progress{
+  width:320px;
+  height:4px;
+  background:#555;
+  margin-top:10px;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.progress div{
+  width:40%;
+  height:100%;
+  background:white;
+}
+
+.volume{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.volume-bar{
+  width:100px;
+  height:4px;
+  background:#555;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.volume-bar div{
+  width:70%;
+  height:100%;
+  background:white;
+}
+</style>
 </head>
+
 <body>
-<aside class="sidebar">
-  <div class="logo"><i class="fab fa-spotify"></i> Spotify</div>
-  <nav class="nav">
-    <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
-    <a href="#"><i class="fas fa-search"></i> Search</a>
-    <a href="#"><i class="fas fa-book-open"></i> Your Library</a>
-  </nav>
-  <hr/>
-  <ul class="plist">
-    <li>Ilaiyaraaja Classics</li>
-    <li>AR Rahman Hits</li>
-    <li>BTS Universe</li>
-    <li>Anirudh Beats</li>
-    <li>Sai Abhyankkar Chill</li>
-    <li>Liked Songs</li>
-  </ul>
-</aside>
-<main class="main">
-  <div class="topbar">
-    <div class="arrows">
-      <button><i class="fas fa-chevron-left"></i></button>
-      <button><i class="fas fa-chevron-right"></i></button>
-    </div>
-    <div class="topbar-r">
-      <button class="upbtn">Upgrade</button>
-      <div class="user"><span class="av"><i class="fas fa-user"></i></span> User <i class="fas fa-caret-down"></i></div>
-    </div>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+  <div class="logo">
+    <i class="fab fa-spotify"></i>
+    Spotify
   </div>
+
+  <div class="nav">
+    <a href="#" class="active">
+      <i class="fas fa-home"></i>
+      Home
+    </a>
+
+    <a href="#">
+      <i class="fas fa-search"></i>
+      Search
+    </a>
+
+    <a href="#">
+      <i class="fas fa-book"></i>
+      Library
+    </a>
+  </div>
+
+  <div class="playlist">
+    <h3>Playlists</h3>
+
+    <p>Ilaiyaraaja Classics</p>
+    <p>AR Rahman Hits</p>
+    <p>BTS Universe</p>
+    <p>Anirudh Beats</p>
+    <p>Liked Songs</p>
+  </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+  <div class="topbar">
+
+    <div class="arrows">
+      <button>
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <button>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="user">
+      <i class="fas fa-user"></i>
+      User
+    </div>
+
+  </div>
+
   <div class="banner">
     <small>ARTIST MIX</small>
+
     <h1>South & K-Pop Legends</h1>
-    <p>Ilaiyaraaja · AR Rahman · BTS · Anirudh · Sai Abhyankkar</p>
-    <button><i class="fas fa-play"></i> Play All</button>
+
+    <p>
+      Ilaiyaraaja · AR Rahman · BTS · Anirudh
+    </p>
+
+    <button>
+      <i class="fas fa-play"></i>
+      Play All
+    </button>
   </div>
+
   <div class="section">
-    <div class="sh"><h2>Featured Artists</h2><a href="#">Show all</a></div>
+
+    <h2>Featured Artists</h2>
+
     <div class="grid" id="artists"></div>
+
   </div>
-</main>
-<footer class="player">
-  <div class="np">
-    <div class="npimg" id="npImg"><i class="fas fa-music"></i></div>
-    <div class="ninfo">
-      <span class="nt" id="npTitle">Choose an artist</span>
-      <span class="na" id="npArtist">—</span>
+
+</div>
+
+<!-- PLAYER -->
+
+<div class="player">
+
+  <div class="song">
+
+    <img
+    id="songImg"
+    src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Ilaiyaraaja_at_Vikram_audio_launch.jpg">
+
+    <div>
+      <h4 id="songTitle">Ilaiyaraaja</h4>
+      <p id="songArtist">Legendary Composer</p>
     </div>
-    <i class="far fa-heart lico" id="likeBtn"></i>
+
   </div>
-  <div class="ctrl">
-    <div class="cbtns">
-      <button class="cb" id="shuf"><i class="fas fa-random"></i></button>
-      <button class="cb"><i class="fas fa-step-backward"></i></button>
-      <button class="cb pp" id="pp"><i class="fas fa-play"></i></button>
-      <button class="cb"><i class="fas fa-step-forward"></i></button>
-      <button class="cb" id="rep"><i class="fas fa-redo"></i></button>
+
+  <div class="controls">
+
+    <div>
+      <button>
+        <i class="fas fa-random"></i>
+      </button>
+
+      <button>
+        <i class="fas fa-step-backward"></i>
+      </button>
+
+      <button class="play-btn" id="playBtn">
+        <i class="fas fa-play"></i>
+      </button>
+
+      <button>
+        <i class="fas fa-step-forward"></i>
+      </button>
+
+      <button>
+        <i class="fas fa-redo"></i>
+      </button>
     </div>
-    <div class="pbc">
-      <span class="tm" id="cur">0:00</span>
-      <div class="pb" id="pb"><div class="pf" id="pf"></div><div class="pt" id="pt"></div></div>
-      <span class="tm">3:30</span>
+
+    <div class="progress">
+      <div></div>
     </div>
+
   </div>
-  <div class="vol">
-    <button class="cb"><i class="fas fa-list"></i></button>
-    <i class="fas fa-volume-up" id="vico"></i>
-    <div class="vb" id="vb"><div class="vf" id="vf"></div><div class="vt" id="vt"></div></div>
+
+  <div class="volume">
+
+    <i class="fas fa-volume-up"></i>
+
+    <div class="volume-bar">
+      <div></div>
+    </div>
+
   </div>
-</footer>
+
+</div>
+
 <script>
-const data=[
-  {name:"Ilaiyaraaja",desc:"Legendary Composer",listeners:"12.1M monthly listeners",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Ilaiyaraaja_at_Vikram_audio_launch.jpg/440px-Ilaiyaraaja_at_Vikram_audio_launch.jpg"},
-  {name:"AR Rahman",desc:"Oscar-Winning Composer",listeners:"18.4M monthly listeners",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/A._R._Rahman_in_2012.jpg/440px-A._R._Rahman_in_2012.jpg"},
-  {name:"BTS",desc:"K-Pop Global Icons",listeners:"35.2M monthly listeners",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/BTS_at_the_2019_Melon_Music_Awards_%28cropped%29.jpg/440px-BTS_at_the_2019_Melon_Music_Awards_%28cropped%29.jpg"},
-  {name:"Anirudh Ravichander",desc:"No.1 South Indian Artist",listeners:"22.7M monthly listeners",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anirudh_Ravichander.jpg/440px-Anirudh_Ravichander.jpg"},
-  {name:"Sai Abhyankkar",desc:"Indie Soul Singer",listeners:"2.1M monthly listeners",img:"https://upload.wikimedia.org/wikipedia/commons/6/65/Sai_Abhyankkar.jpg"},
+
+const artists = [
+
+{
+  name:"Ilaiyaraaja",
+  desc:"Legendary Composer",
+  img:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Ilaiyaraaja_at_Vikram_audio_launch.jpg"
+},
+
+{
+  name:"AR Rahman",
+  desc:"Oscar Winning Composer",
+  img:"https://upload.wikimedia.org/wikipedia/commons/0/06/A._R._Rahman_in_2012.jpg"
+},
+
+{
+  name:"BTS",
+  desc:"K-Pop Global Icons",
+  img:"https://upload.wikimedia.org/wikipedia/commons/0/0f/BTS_at_the_2019_Melon_Music_Awards_%28cropped%29.jpg"
+},
+
+{
+  name:"Anirudh Ravichander",
+  desc:"South Indian Music Star",
+  img:"https://upload.wikimedia.org/wikipedia/commons/a/a6/Anirudh_Ravichander.jpg"
+},
+
+{
+  name:"Sai Abhyankkar",
+  desc:"Indie Soul Singer",
+  img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop"
+}
+
 ];
-document.getElementById('artists').innerHTML=data.map(d=>`
-  <div class="card" data-name="${d.name}" data-desc="${d.desc}" data-img="${d.img}">
-    <div class="cimg"><img src="${d.img}" alt="${d.name}" onerror="this.src='https://via.placeholder.com/200x200/282828/1db954?text=${encodeURIComponent(d.name[0])}'"/></div>
-    <div class="cplay"><i class="fas fa-play"></i></div>
-    <div class="ctitle">${d.name}</div>
-    <div class="csub">${d.listeners}</div>
-  </div>`).join('');
-let playing=false,pct=0;
-const pp=document.getElementById('pp');
-pp.onclick=()=>{playing=!playing;pp.innerHTML=playing?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>'};
-document.addEventListener('click',e=>{
-  const c=e.target.closest('.card');if(!c)return;
-  document.getElementById('npTitle').textContent=c.dataset.name;
-  document.getElementById('npArtist').textContent=c.dataset.desc;
-  const ni=document.getElementById('npImg');
-  ni.innerHTML=<img src="${c.dataset.img}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-music\\'></i>'"/>;
-  playing=true;pp.innerHTML='<i class="fas fa-pause"></i>';pct=0;
+
+const container = document.getElementById("artists");
+
+artists.forEach(artist => {
+
+  container.innerHTML += `
+
+  <div class="card">
+
+    <img src="${artist.img}" alt="${artist.name}">
+
+    <h3>${artist.name}</h3>
+
+    <p>${artist.desc}</p>
+
+  </div>
+
+  `;
+
 });
-const pb=document.getElementById('pb'),pf=document.getElementById('pf'),pt=document.getElementById('pt');
-pb.onclick=e=>{const r=pb.getBoundingClientRect();pct=((e.clientX-r.left)/r.width)*100;upd()};
-function upd(){pf.style.width=pt.style.left=pct+'%';const s=Math.round(pct/100*210);document.getElementById('cur').textContent=${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}}
-setInterval(()=>{if(!playing)return;pct=pct>=100?0:pct+0.04;upd()},300);
-const vb=document.getElementById('vb'),vf=document.getElementById('vf'),vt=document.getElementById('vt');
-vb.onclick=e=>{const r=vb.getBoundingClientRect(),p=(e.clientX-r.left)/r.width;vf.style.width=vt.style.left=(p*100)+'%';document.getElementById('vico').className=p<.05?'fas fa-volume-mute':p<.5?'fas fa-volume-down':'fas fa-volume-up'};
-document.getElementById('likeBtn').onclick=function(){const l=this.classList.toggle('fas');this.classList.toggle('far',!l);this.style.color=l?'#1db954':''};
-['shuf','rep'].forEach(id=>document.getElementById(id).onclick=function(){this.style.color=this.style.color==='rgb(29, 185, 84)'?'':'#1db954'});
-document.querySelectorAll('.nav a').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active')});
+
+const cards = document.querySelectorAll(".card");
+
+cards.forEach((card,index)=>{
+
+  card.addEventListener("click",()=>{
+
+    document.getElementById("songImg").src =
+    artists[index].img;
+
+    document.getElementById("songTitle").innerText =
+    artists[index].name;
+
+    document.getElementById("songArtist").innerText =
+    artists[index].desc;
+
+  });
+
+});
+
+let playing = false;
+
+document.getElementById("playBtn")
+.addEventListener("click",function(){
+
+  playing = !playing;
+
+  this.innerHTML = playing
+  ? '<i class="fas fa-pause"></i>'
+  : '<i class="fas fa-play"></i>';
+
+});
+
 </script>
+
 </body>
 </html>
