@@ -1,51 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [questions, setQuestions] = useState<any[]>([]);
 
-  const addQuestion = () => {
-    if (!question.trim()) return;
+  // LOAD DATA
+  const fetchQuestions = async () => {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*")
+      .order("id", { ascending: false });
 
-    setQuestions([
-      {
-        id: Date.now(),
-        text: question,
-        votes: 0,
-      },
-      ...questions,
-    ]);
+    console.log("FETCH DATA:", data);
+    console.log("FETCH ERROR:", error);
 
-    setQuestion("");
+    if (data) setQuestions(data);
   };
 
-  const upvote = (id: number) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === id ? { ...q, votes: q.votes + 1 } : q
-      )
-    );
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  // ➕ ADD QUESTION
+ const addQuestion = async () => {
+  if (!question.trim()) return;
+
+  const { data, error } = await supabase
+    .from("questions")
+    .insert([{ text: question, votes: 0 }])
+    .select();
+
+  console.log("INSERT RESULT:", data, error);
+
+  if (error) return;
+
+  if (data) {
+    setQuestions((prev) => [data[0], ...prev]);
+    setQuestion("");
+  }
+};
+
+  // VOTE
+  const upvote = async (id: number, votes: number) => {
+    const { error } = await supabase
+      .from("questions")
+      .update({ votes: votes + 1 })
+      .eq("id", id);
+
+    console.log("VOTE ERROR:", error);
+
+    fetchQuestions();
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center p-6">
-      
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
 
-        {/* Header */}
-        <h1 className="text-2xl font-bold text-center mb-1">
-          Live Q&A
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Live Q&A (V2 Storage)
         </h1>
-        <p className="text-center text-gray-500 text-sm mb-6">
-          Ask questions and vote
-        </p>
 
-        {/* Input */}
+        {/* INPUT */}
         <div className="flex gap-2 mb-6">
           <input
-            className="flex-1 border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black"
+            className="flex-1 border rounded-lg px-4 py-3"
             placeholder="Ask a question..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
@@ -53,40 +74,31 @@ export default function Home() {
 
           <button
             onClick={addQuestion}
-            className="bg-black text-white px-5 rounded-lg hover:bg-gray-800"
+            className="bg-black text-white px-5 rounded-lg"
           >
             Ask
           </button>
         </div>
 
-        {/* Questions */}
+        {/* LIST */}
         <div className="space-y-3">
-
-          {questions.length === 0 && (
-            <p className="text-center text-gray-400 text-sm">
-              No questions yet. Be the first to ask.
-            </p>
-          )}
-
           {questions.map((q) => (
             <div
               key={q.id}
-              className="flex items-center justify-between border rounded-lg p-4 bg-gray-50"
+              className="flex justify-between items-center border p-4 rounded-lg bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                
                 <button
-                  onClick={() => upvote(q.id)}
-                  className="border px-3 py-1 rounded hover:bg-gray-200"
+                  onClick={() => upvote(q.id, q.votes)}
+                  className="border px-3 py-1 rounded"
                 >
                   ▲ {q.votes}
                 </button>
 
-                <p className="text-gray-800">{q.text}</p>
+                <p>{q.text}</p>
               </div>
             </div>
           ))}
-
         </div>
 
       </div>
