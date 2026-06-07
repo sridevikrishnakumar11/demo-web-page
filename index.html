@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+,::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#0a0c14;--paper:#f5f0e8;--cream:#ede8dc;--warm:#d4c9b0;
+  --accent:#c84b31;--accent2:#2d6a4f;--accent3:#e9a825;--blue:#1d3557;
+  --text:#1a1c2a;--muted:#7a7060;
+}
+body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--text);}
+
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2rem;border-bottom:1.5px solid var(--warm);
+  background:var(--paper);position:sticky;top:0;z-index:100;
+}
+.logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:1.5rem;list-style:none;}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:.8rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase;}
+.nav-btn{background:var(--ink);color:var(--paper);border:none;border-radius:6px;padding:.45rem 1rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;}
+
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 2rem;max-width:1100px;margin:0 auto;}
+.hero-tag{display:inline-flex;align-items:center;gap:.4rem;background:var(--cream);border:1px solid var(--warm);border-radius:99px;padding:.25rem .8rem;font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem;}
+.hero-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;line-height:1.1;margin-bottom:.8rem;}
+h1 em{font-style:italic;color:var(--accent);}
+.hero-sub{font-size:.92rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:1.5rem;}
+.hero-actions{display:flex;gap:.8rem;}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:.65rem 1.4rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;}
+.btn-secondary{background:transparent;color:var(--text);border:1.5px solid var(--warm);border-radius:7px;padding:.65rem 1.4rem;font-family:'Outfit',sans-serif;font-weight:500;font-size:.88rem;cursor:pointer;}
+
+.week-card{background:#fff;border-radius:16px;border:1.5px solid var(--warm);padding:1.4rem;box-shadow:6px 6px 0 var(--warm);}
+.week-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.week-card-top h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.week-pill{background:var(--cream);border-radius:99px;padding:.2rem .7rem;font-size:.7rem;font-weight:600;color:var(--muted);}
+.day-row{display:flex;gap:.35rem;margin-bottom:1rem;}
+.day-btn{flex:1;text-align:center;padding:.4rem .2rem;border-radius:6px;font-size:.7rem;font-weight:600;border:1.5px solid var(--warm);cursor:pointer;background:transparent;color:var(--muted);}
+.day-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.day-btn.has{background:var(--cream);color:var(--text);}
+.session-item{display:flex;align-items:center;gap:.7rem;padding:.65rem .8rem;border-radius:8px;margin-bottom:.5rem;}
+.s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.s-info{flex:1;}
+.s-name{font-weight:600;font-size:.82rem;}
+.s-time{font-size:.7rem;color:var(--muted);}
+.s-dur{font-weight:700;font-size:.78rem;background:var(--cream);border-radius:5px;padding:.15rem .45rem;}
+
+.stats-strip{background:var(--ink);color:var(--paper);padding:1.8rem 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;}
+.stat-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--accent3);}
+.stat-label{font-size:.7rem;font-weight:500;color:#9a9a9a;margin-top:.3rem;letter-spacing:.05em;text-transform:uppercase;}
+
+.section{max-width:1100px;margin:0 auto;padding:2.5rem 2rem;}
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem;}
+.section-header h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;}
+.section-header h2 span{color:var(--accent);}
+.see-all{font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--warm);}
+
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem;}
+.course-card{background:#fff;border:1.5px solid var(--warm);border-radius:12px;padding:1rem;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s;}
+.course-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.course-card:hover{transform:translateY(-2px);}
+.c1::before{background:var(--accent);}
+.c2::before{background:var(--accent2);}
+.c3::before{background:var(--accent3);}
+.c4::before{background:var(--blue);}
+.c5::before{background:#7b2d8b;}
+.c6::before{background:#c06014;}
+.course-icon{font-size:1.5rem;margin-bottom:.5rem;}
+.course-name{font-weight:700;font-size:.88rem;margin-bottom:.15rem;}
+.course-cat{font-size:.7rem;color:var(--muted);}
+.course-hrs{margin-top:.7rem;display:flex;align-items:center;gap:.6rem;}
+.course-progress{height:4px;background:var(--cream);border-radius:99px;flex:1;overflow:hidden;}
+.course-fill{height:100%;border-radius:99px;}
+.course-pct{font-size:.68rem;font-weight:700;color:var(--muted);}
+
+.schedule-wrap{background:#fff;border:1.5px solid var(--warm);border-radius:16px;overflow:hidden;box-shadow:5px 5px 0 var(--cream);}
+.schedule-top{padding:1rem 1.4rem;border-bottom:1px solid var(--cream);display:flex;justify-content:space-between;align-items:center;}
+.schedule-top h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.days-tabs{display:flex;gap:.3rem;}
+.dtab{padding:.28rem .65rem;border-radius:5px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid var(--warm);background:transparent;color:var(--muted);}
+.dtab.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.schedule-body{padding:1rem 1.4rem;}
+.sched-row{display:grid;grid-template-columns:65px 1fr 85px 65px;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--cream);}
+.sched-row:last-child{border-bottom:none;}
+.sched-time{font-size:.75rem;font-weight:600;color:var(--muted);}
+.sched-course{display:flex;align-items:center;gap:.55rem;}
+.sched-dot{width:7px;height:7px;border-radius:50%;}
+.sched-cname{font-weight:600;font-size:.84rem;}
+.sched-csub{font-size:.68rem;color:var(--muted);}
+.sched-badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.68rem;font-weight:600;}
+.badge-study{background:#e8f5e9;color:#2d6a4f;}
+.badge-review{background:#fff3e0;color:#c06014;}
+.badge-practice{background:#e8eaf6;color:#3949ab;}
+.sched-dur{font-weight:700;font-size:.8rem;text-align:right;}
+
+.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.prog-card{background:#fff;border:1.5px solid var(--warm);border-radius:14px;padding:1.2rem;}
+.prog-card h4{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;margin-bottom:1rem;}
+.prog-item{margin-bottom:.8rem;}
+.prog-item:last-child{margin-bottom:0;}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:.3rem;}
+.prog-name{font-size:.8rem;font-weight:600;}
+.prog-val{font-size:.72rem;color:var(--muted);}
+.prog-bar{height:6px;background:var(--cream);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;}
+.streak-card{background:var(--ink);color:var(--paper);border-radius:14px;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;}
+.streak-card h4{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;}
+.streak-nums{display:flex;gap:1.2rem;}
+.streak-num .n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--accent3);}
+.streak-num .l{font-size:.65rem;color:#9a9a9a;text-transform:uppercase;letter-spacing:.05em;}
+.streak-dots{display:flex;gap:.3rem;}
+.sdot{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;}
+.sdot.done{background:var(--accent2);color:#fff;}
+.sdot.today{background:var(--accent3);color:var(--ink);}
+.sdot.miss{background:#2a2a3a;color:#555;}
+
+footer{background:var(--ink);color:#6a6a7a;padding:1.4rem 2rem;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;}
+footer .logo{color:var(--paper);}
+
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .hero{grid-template-columns:1fr;padding:2rem 1.5rem;}
+  .hero-right{display:none;}
+  .stats-strip{grid-template-columns:repeat(2,1fr);}
+  .progress-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+  <nav>
+  <div class="logo">Study<span>Flow</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Courses</a></li>
+    <li><a href="#">Schedule</a></li>
+    <li><a href="#">Progress</a></li>
+  </ul>
+  <button class="nav-btn">+ New Session</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Your Weekly Planner</div>
+    <h1>Study <em>Smarter,</em><br>Not Harder.</h1>
+    <p class="hero-sub">Organize courses, schedule sessions, and track your progress — all in one place.</p>
+    <div class="hero-actions">
+      <button class="btn-primary">Get Started</button>
+      <button class="btn-secondary">View Schedule</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="week-card">
+      <div class="week-card-top"><h3>This Week</h3><span class="week-pill">May 2026</span></div>
+      <div class="day-row">
+        <button class="day-btn has">M</button><button class="day-btn has">T</button>
+        <button class="day-btn active">W</button><button class="day-btn has">T</button>
+        <button class="day-btn">F</button><button class="day-btn">S</button><button class="day-btn">S</button>
+      </div>
+      <div class="session-item" style="background:#f0fdf4;">
+        <div class="s-dot" style="background:#2d6a4f;"></div>
+        <div class="s-info"><div class="s-name">Mathematics</div><div class="s-time">9:00 AM — Calculus</div></div>
+        <div class="s-dur">2h</div>
+      </div>
+      <div class="session-item" style="background:#fef9ec;">
+        <div class="s-dot" style="background:#e9a825;"></div>
+        <div class="s-info"><div class="s-name">Physics</div><div class="s-time">11:30 AM — Waves</div></div>
+        <div class="s-dur">1.5h</div>
+      </div>
+      <div class="session-item" style="background:#fdf0ee;">
+        <div class="s-dot" style="background:#c84b31;"></div>
+        <div class="s-info"><div class="s-name">Computer Science</div><div class="s-time">2:00 PM — Algorithms</div></div>
+        <div class="s-dur">2h</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-strip">
+  <div><div class="stat-num">6</div><div class="stat-label">Courses</div></div>
+  <div><div class="stat-num">18</div><div class="stat-label">Sessions</div></div>
+  <div><div class="stat-num">34h</div><div class="stat-label">Hours</div></div>
+  <div><div class="stat-num">12</div><div class="stat-label">Day Streak 🔥</div></div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <h2>Your <span>Courses</span></h2>
+    <a href="#" class="see-all">See All →</a>
+  </div>
+  <div class="courses-grid">
+    <div class="course-card c1"><div class="course-icon">🔢</div><div class="course-name">Mathematics</div><div class="course-cat">Science · Calculus</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:72%;background:#c84b31;"></div></div><div class="course-pct">72%</div></div></div>
+    <div class="course-card c2"><div class="course-icon">⚛️</div><div class="course-name">Physics</div><div class="course-cat">Science · Waves</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:55%;background:#2d6a4f;"></div></div><div class="course-pct">55%</div></div></div>
+    <div class="course-card c3"><div class="course-icon">💻</div><div class="course-name">Computer Science</div><div class="course-cat">Technology</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:88%;background:#e9a825;"></div></div><div class="course-pct">88%</div></div></div>
+    <div class="course-card c4"><div class="course-icon">📜</div><div class="course-name">History</div><div class="course-cat">Humanities</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:40%;background:#1d3557;"></div></div><div class="course-pct">40%</div></div></div>
+    <div class="course-card c5"><div class="course-icon">🧪</div><div class="course-name">Chemistry</div><div class="course-cat">Science · Organic</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:63%;background:#7b2d8b;"></div></div><div class="course-pct">63%</div></div></div>
+    <div class="course-card c6"><div class="course-icon">📈</div><div class="course-name">Economics</div><div class="course-cat">Social</div><div class="course-hrs"><div class="course-progress"><div class="course-fill" style="width:30%;background:#c06014;"></div></div><div class="course-pct">30%</div></div></div>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="section-header"><h2>Today's <span>Schedule</span></h2></div>
+  <div class="schedule-wrap">
+    <div class="schedule-top">
+      <h3>Wednesday, 28 May</h3>
+      <div class="days-tabs">
+        <button class="dtab">Mon</button><button class="dtab">Tue</button>
+        <button class="dtab on">Wed</button><button class="dtab">Thu</button><button class="dtab">Fri</button>
+      </div>
+    </div>
+    <div class="schedule-body">
+      <div class="sched-row"><div class="sched-time">9:00 AM</div><div class="sched-course"><div class="sched-dot" style="background:#c84b31;"></div><div><div class="sched-cname">Mathematics</div><div class="sched-csub">Calculus Ch.5</div></div></div><div><span class="sched-badge badge-study">Study</span></div><div class="sched-dur">2h</div></div>
+      <div class="sched-row"><div class="sched-time">11:30 AM</div><div class="sched-course"><div class="sched-dot" style="background:#2d6a4f;"></div><div><div class="sched-cname">Physics</div><div class="sched-csub">Wave Motion</div></div></div><div><span class="sched-badge badge-review">Review</span></div><div class="sched-dur">1.5h</div></div>
+      <div class="sched-row"><div class="sched-time">2:00 PM</div><div class="sched-course"><div class="sched-dot" style="background:#e9a825;"></div><div><div class="sched-cname">Computer Science</div><div class="sched-csub">Algorithms</div></div></div><div><span class="sched-badge badge-practice">Practice</span></div><div class="sched-dur">2h</div></div>
+      <div class="sched-row"><div class="sched-time">4:30 PM</div><div class="sched-course"><div class="sched-dot" style="background:#7b2d8b;"></div><div><div class="sched-cname">Chemistry</div><div class="sched-csub">Organic Reactions</div></div></div><div><span class="sched-badge badge-study">Study</span></div><div class="sched-dur">1h</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="section-header"><h2>Weekly <span>Progress</span></h2></div>
+  <div class="progress-grid">
+    <div class="prog-card">
+      <h4>Hours per Course</h4>
+      <div class="prog-item"><div class="prog-top"><span class="prog-name">🔢 Mathematics</span><span class="prog-val">8h / 10h</span></div><div class="prog-bar"><div class="prog-fill" style="width:80%;background:#c84b31;"></div></div></div>
+      <div class="prog-item"><div class="prog-top"><span class="prog-name">💻 Computer Science</span><span class="prog-val">7h / 8h</span></div><div class="prog-bar"><div class="prog-fill" style="width:87%;background:#e9a825;"></div></div></div>
+      <div class="prog-item"><div class="prog-top"><span class="prog-name">⚛️ Physics</span><span class="prog-val">5h / 8h</span></div><div class="prog-bar"><div class="prog-fill" style="width:62%;background:#2d6a4f;"></div></div></div>
+      <div class="prog-item"><div class="prog-top"><span class="prog-name">🧪 Chemistry</span><span class="prog-val">4h / 6h</span></div><div class="prog-bar"><div class="prog-fill" style="width:66%;background:#7b2d8b;"></div></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="streak-card">
+        <h4>Study Streak 🔥</h4>
+        <div class="streak-nums">
+          <div class="streak-num"><div class="n">12</div><div class="l">Current</div></div>
+          <div class="streak-num"><div class="n">21</div><div class="l">Best</div></div>
+          <div class="streak-num"><div class="n">34h</div><div class="l">This Week</div></div>
+        </div>
+        <div class="streak-dots">
+          <div class="sdot done">M</div><div class="sdot done">T</div><div class="sdot today">W</div>
+          <div class="sdot miss">T</div><div class="sdot miss">F</div><div class="sdot miss">S</div><div class="sdot miss">S</div>
+        </div>
+      </div>
+      <div class="prog-card">
+        <h4>Session Types</h4>
+        <div class="prog-item"><div class="prog-top"><span class="prog-name">📖 Study</span><span class="prog-val">10 sessions</span></div><div class="prog-bar"><div class="prog-fill" style="width:55%;background:#2d6a4f;"></div></div></div>
+        <div class="prog-item"><div class="prog-top"><span class="prog-name">🔁 Review</span><span class="prog-val">5 sessions</span></div><div class="prog-bar"><div class="prog-fill" style="width:28%;background:#c06014;"></div></div></div>
+        <div class="prog-item"><div class="prog-top"><span class="prog-name">✏️ Practice</span><span class="prog-val">3 sessions</span></div><div class="prog-bar"><div class="prog-fill" style="width:17%;background:#3949ab;"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="logo">Study<span style="color:#c84b31;">Flow</span></div>
+  <div>HTML · CSS · JS</div>
+  <div>© 2026 StudyFlow</div>
+</footer>
+
+</body>
+</html>
