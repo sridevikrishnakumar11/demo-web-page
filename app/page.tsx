@@ -1,93 +1,176 @@
 "use client";
 
-import { useState } from "react";
-
-type QA = {
-  id: number;
-  question: string;
-  answer: string;
-};
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Home() {
   const [question, setQuestion] = useState("");
-  const [qaList, setQaList] = useState<QA[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [questions, setQuestions] = useState<any[]>([]);
 
-  const askAI = async () => {
-    if (!question.trim()) return;
+  // 🔄 FETCH
+  const fetchQuestions = async () => {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*")
+      .order("id", { ascending: false });
 
-    setLoading(true);
+    console.log("FETCH:", data, error);
 
-    try {
-      const res = await fetch("/api/qa", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question,
-        }),
-      });
+    if (data) setQuestions(data);
+  };
 
-     const data = await res.json();
-    
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
-      setQaList((prev) => [
-        {
-          id: Date.now(),
-          question,
-          answer: data.answer,
-        },
-        ...prev,
-      ]);
+  // ➕ ADD
+ 
+  const addQuestion = async () => {
+try {
+if (!question.trim()) return;
 
-      setQuestion("");
-    } catch (error) {
-      console.error(error);
-    }
+const res = await fetch("/api/qa", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    question,
+  }),
+});
 
-    setLoading(false);
+const aiData = await res.json();
+
+if (!res.ok) {
+  console.log(aiData);
+  return;
+}
+
+const { data: inserted, error } = await supabase
+  .from("questions")
+  .insert([
+    {
+      text: question,
+      votes: 0,
+      answer: aiData.answer,
+    },
+  ])
+  .select();
+
+if (error) {
+  console.log("SUPABASE ERROR:", error);
+  return;
+}
+
+if (inserted && inserted.length > 0) {
+  setQuestions((prev) => [inserted[0], ...prev]);
+}
+
+setQuestion("");
+
+} catch (err) {
+console.log("FRONTEND ERROR:", err);
+}
+};
+const votePoll = async (
+  id: number,
+  side: "a" | "b",
+  currentVotes: number
+) => {
+  const field = side === "a" ? "votes_a" : "votes_b";
+
+  await supabase
+    .from("questions")
+    .update({
+      [field]: currentVotes + 1,
+    })
+    .eq("id", id);
+
+  fetchQuestions();
+};
+//👍 VOTE
+  const upvote = async (id: number, votes: number) => {
+    await supabase
+      .from("questions")
+      .update({ votes: votes + 1 })
+      .eq("id", id);
+
+    fetchQuestions();
   };
 
   return (
-    <main className="max-w-3xl mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-6">
-        AI Q&A
-      </h1>
+    <div className="min-h-screen bg-gray-900 text-white flex justify-center p-6">
+      <div className="w-full max-w-xl bg-gray-800 rounded-2xl shadow-lg p-6">
 
-      <div className="flex gap-2 mb-6">
-        <input
-          className="border p-3 flex-1 rounded"
-          placeholder="Ask anything..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-        />
+        <h1 className="text-2xl font-bold text-center mb-6">
+          QA App V3 🚀
+        </h1>
 
-        <button
-          onClick={askAI}
-          disabled={loading}
-          className="bg-black text-white px-5 rounded"
-        >
-          {loading ? "Thinking..." : "Ask"}
-        </button>
-      </div>
+        {/* INPUT */}
+        <div className="flex gap-2 mb-6">
+          <input
+            className="flex-1 border border-gray-600 bg-gray-900 text-white rounded-lg px-4 py-3"
+            placeholder="Ask a question..."
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+          />
 
-      <div className="space-y-4">
-        {qaList.map((item) => (
-          <div
-            key={item.id}
-            className="border rounded p-4"
+          <button
+            onClick={addQuestion}
+            className="bg-blue-500 text-white px-5 rounded-lg"
           >
-            <p className="font-semibold">
-              Q: {item.question}
-            </p>
+            Ask
+          </button>
+        </div>
 
-            <p className="mt-2">
-              A: {item.answer}
-            </p>
-          </div>
-        ))}
+        {/* LIST */}
+        <div className="space-y-3">
+          {questions.length === 0 ? (
+            <p className="text-gray-400 text-center">No questions yet</p>
+          ) : (
+            questions.map((q) => (
+  <div
+    key={q.id}
+    className="bg-gray-900 border border-gray-700 p-4 rounded-lg"
+  >
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => upvote(q.id, q.votes)}
+        className="border px-3 py-1 rounded"
+      >
+        ▲ {q.votes}
+      </button>
+
+      <p>{q.text}</p>
+    </div>
+
+   {q.is_poll ? (
+  <div className="mt-3 space-y-2">
+    <button
+      onClick={() => votePoll(q.id, "a", q.votes_a)}
+      className="block w-full border p-2 rounded"
+    >
+      {q.option_a} ({q.votes_a})
+    </button>
+
+    <button
+      onClick={() => votePoll(q.id, "b", q.votes_b)}
+      className="block w-full border p-2 rounded"
+    >
+      {q.option_b} ({q.votes_b})
+    </button>
+  </div>
+) : (
+  <p className="mt-3 text-green-400">
+    {q.answer}
+  </p>
+)}
+  </div>
+))
+)}
+        </div>
+
       </div>
-    </main>
+    </div>
   );
 }
