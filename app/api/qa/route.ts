@@ -4,16 +4,23 @@ export async function POST(req: Request) {
   try {
     const { question } = await req.json();
 
+    if (typeof question !== "string" || !question.trim()) {
+      return Response.json(
+        { error: "Please enter a question." },
+        { status: 400 }
+      );
+    }
+
     const groq = new Groq({
       apiKey: process.env.GROQ_API_KEY,
     });
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+  model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "user",
-          content: question,
+          content: question.trim(),
         },
       ],
     });
